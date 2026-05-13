@@ -1,66 +1,214 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Laravel Repository Service Pattern
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Dokumentasi ini menjelaskan cara clone project, install package, setup database, menjalankan aplikasi, dan beberapa hal penting yang perlu diperhatikan saat pengembangan.
 
-## About Laravel
+## Ringkasan Project
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Project ini menggunakan Laravel 9 dengan pendekatan Repository Service Pattern untuk memisahkan logika akses data dan logika bisnis. Contoh fitur utama yang tersedia adalah CRUD `Bahan Baku`.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Struktur penting:
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- `app/Models/BahanBaku.php`: model untuk tabel `bahan_baku`.
+- `app/Repositories/`: layer akses data.
+- `app/Services/`: layer logika bisnis.
+- `app/Http/Controllers/BahanBakuController.php`: controller CRUD bahan baku.
+- `resources/views/bahan-baku/`: halaman Blade untuk CRUD bahan baku.
+- `routes/web.php`: route web aplikasi.
 
-## Learning Laravel
+## Prasyarat
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+Pastikan perangkat sudah memiliki:
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+- PHP `8.0.2` atau lebih baru.
+- Composer.
+- Node.js dan npm.
+- MySQL atau MariaDB.
+- Git.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Cek versi dengan perintah:
 
-## Laravel Sponsors
+```bash
+php -v
+composer -V
+node -v
+npm -v
+git --version
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+## Clone Project
 
-### Premium Partners
+Clone repository dari remote project:
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+```bash
+git clone https://github.com/dzaki236/laravel-service-repository-template.git
+cd laravel-repository-service-pattern
+```
 
-## Contributing
+Ganti `https://github.com/dzaki236/laravel-service-repository-template.git` dengan URL repository Git yang sebenarnya.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## Install Package Backend
 
-## Code of Conduct
+Install dependency Laravel menggunakan Composer:
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```bash
+composer install
+```
 
-## Security Vulnerabilities
+Jika ingin memperbarui dependency sesuai constraint di `composer.json`, gunakan:
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```bash
+composer update
+```
 
-## License
+Gunakan `composer install` untuk setup normal dari repository karena perintah ini mengikuti `composer.lock` bila tersedia.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## Install Package Frontend
+
+Install dependency frontend untuk Vite:
+
+```bash
+npm install
+```
+
+Dependency frontend utama berada di `package.json`, termasuk `vite`, `laravel-vite-plugin`, dan `axios`.
+
+## Setup Environment
+
+Salin file environment:
+
+```bash
+cp .env.example .env
+```
+
+Jika menggunakan PowerShell di Windows:
+
+```powershell
+Copy-Item .env.example .env
+```
+
+Generate application key:
+
+```bash
+php artisan key:generate
+```
+
+Pastikan nilai `APP_KEY` sudah terisi di file `.env`.
+
+## Setup Database
+
+Buat database baru di MySQL atau MariaDB, misalnya:
+
+```sql
+CREATE DATABASE laravel_repository_service_pattern;
+```
+
+Sesuaikan konfigurasi database di file `.env`:
+
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=laravel_repository_service_pattern
+DB_USERNAME=root
+DB_PASSWORD=
+```
+
+Sesuaikan `DB_USERNAME` dan `DB_PASSWORD` dengan konfigurasi database lokal Anda.
+
+Setelah konfigurasi database benar, jalankan migrasi:
+
+```bash
+php artisan migrate
+```
+
+Migrasi akan membuat tabel bawaan Laravel serta tabel `bahan_baku` dengan kolom:
+
+- `id`
+- `nama`
+- `kode`
+- `stok`
+- `satuan`
+- `harga`
+- `created_at`
+- `updated_at`
+
+## Menjalankan Aplikasi
+
+Jalankan server Laravel:
+
+```bash
+php artisan serve
+```
+
+Secara default aplikasi berjalan di:
+
+```text
+http://127.0.0.1:8000
+```
+
+## Route Utama
+
+Project mendaftarkan resource route berikut:
+
+```php
+Route::resource('bahan-baku', BahanBakuController::class);
+```
+
+Route ini menghasilkan endpoint web untuk:
+
+- Melihat daftar bahan baku.
+- Membuka form tambah bahan baku.
+- Menyimpan bahan baku baru.
+- Membuka form edit bahan baku.
+- Mengupdate bahan baku.
+- Menghapus bahan baku.
+
+## Perintah Artisan yang Sering Dipakai
+
+Bersihkan cache konfigurasi dan aplikasi:
+
+```bash
+php artisan optimize:clear
+```
+
+Jalankan migrasi ulang dari awal untuk database:
+
+```bash
+php artisan migrate:fresh --seed
+```
+
+Jalankan Tinker:
+
+```bash
+php artisan tinker
+```
+
+## Hal Penting yang Perlu Diperhatikan
+
+- Jangan commit file `.env` karena berisi konfigurasi lokal dan dapat berisi data sensitif.
+- Pastikan database sudah dibuat sebelum menjalankan `php artisan migrate`.
+- Jalankan `php artisan key:generate` setelah membuat file `.env`.
+- Jalankan `npm run dev` saat pengembangan agar asset Vite tersedia.
+- Field `kode` pada tabel `bahan_baku` bersifat unik, sehingga tidak boleh ada dua bahan baku dengan kode yang sama.
+- Project ini menggunakan Repository Service Pattern, jadi perubahan akses data sebaiknya diletakkan di repository, sedangkan logika bisnis diletakkan di service.
+- Sebelum deploy production, ubah `APP_ENV=production`, `APP_DEBUG=false`, dan pastikan konfigurasi database serta cache sudah sesuai environment server.
+
+## Troubleshooting
+
+Jika muncul error `No application encryption key has been specified`, jalankan:
+
+```bash
+php artisan key:generate
+```
+
+Jika perubahan `.env` belum terbaca, jalankan:
+
+```bash
+php artisan optimize:clear
+```
+
+Jika tabel belum ditemukan, pastikan database benar dan jalankan:
+
+```bash
+php artisan migrate
+```
